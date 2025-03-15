@@ -17,6 +17,9 @@ public class RescisaoRequest {
     @NotNull(message = "A data de desligamento não pode ser nula")
     private LocalDate dataDesligamento;
 
+    @NotNull(message = "A data de Admissao não pode ser nula")
+    private LocalDate dataAdmissao;
+
     private LocalDate dataAvisoPrevio;
 
     private Integer diasAvisoPrevio;
