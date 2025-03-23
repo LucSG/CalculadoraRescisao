@@ -14,7 +14,11 @@ public class VerificadoresService {
     public static int quantidadeDiasMes(RescisaoRequest request) { //pegar a quantidade de dias no mes 
         YearMonth yearMonth = YearMonth.of(request.getDataDesligamento().getYear(), request.getDataDesligamento().getMonth());
         int maximoDiasNoMes = yearMonth.lengthOfMonth();
-        return maximoDiasNoMes;
+        if (maximoDiasNoMes >= 30) {
+            return 30;
+        } else {
+            return maximoDiasNoMes;
+        }
     }
 
     public static boolean mesmoMes(RescisaoRequest request) {//verificador se a pessoa comecou e terminou de trabalhar no mesmo mês
@@ -22,17 +26,22 @@ public class VerificadoresService {
     }
 
     public static long quantidadeMeses(RescisaoRequest request) {//pegar quantidade de meses trabalhados
-        //se comecou antes do dia 15 ele já conta um mês!
-        //se foi demitido dia 15 ou depois o mês inteiro também conta!
-        long meses = ChronoUnit.MONTHS.between(request.getDataAdmissao().withDayOfMonth(1), request.getDataDesligamento().withDayOfMonth(1));
-        //calcula a quantidade de meses
-        if (request.getDataAdmissao().getDayOfMonth() > 15) {//se entrou depois do dia 15 tira um mes
-            meses--;
-        }
-        if (request.getDataDesligamento().getDayOfMonth() >= 15) {//se saiu depois do dia 15 conta mais um mes
-            meses++;
+        //se comecou antes do dia 15 ele já conta um mês! && se foi demitido dia 15 ou depois o mês inteiro também conta!
+        long meses = 0;
+        if (request.getDataAdmissao().getYear() < request.getDataDesligamento().getYear()) {
+            meses = ChronoUnit.MONTHS.between(request.getDataDesligamento().withDayOfYear(1), request.getDataDesligamento().withDayOfMonth(1));
+        } else {
+            meses = ChronoUnit.MONTHS.between(request.getDataAdmissao().withDayOfMonth(1), request.getDataDesligamento().withDayOfMonth(1));//calcula a quantidade de meses
+            if (request.getDataAdmissao().getDayOfMonth() > 15)//se entrou depois do dia 15 tira um mes
+            {
+                meses--;
+            }
         }
 
+        if (request.getDataDesligamento().getDayOfMonth() >= 15)//se saiu depois do dia 15 conta mais um mes
+        {
+            meses++;
+        }
 
         return meses;
     }
