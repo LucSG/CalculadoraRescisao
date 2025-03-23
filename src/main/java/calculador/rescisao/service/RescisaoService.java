@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import calculador.rescisao.model.RescisaoRequest;
 import calculador.rescisao.model.RescisaoResponse;
 import calculador.rescisao.service.calculo.SaldoSalarioService;
+import calculador.rescisao.service.calculo.VerificadoresService;
 
 @Service
 public class RescisaoService {
@@ -29,7 +30,12 @@ public class RescisaoService {
             throw new IllegalArgumentException("Salário inválido.");
         }
 
-        response.setSaldoSalario(saldoSalarioService.calcular(request));
+        //retorno do calculo do saldo de salario em 2 casas decimais
+        response.setSaldoSalario(saldoSalarioService.calcular(request).setScale(2, RoundingMode.HALF_UP)); 
+        response.setTotalBruto(BigDecimal.valueOf(VerificadoresService.quantidadeMeses(request)));
+
+        //Calculo de ferias
+        
 
 
        
@@ -47,11 +53,7 @@ public class RescisaoService {
         BigDecimal decimoTerceiroProporcional = request.getSalario().divide(BigDecimal.valueOf(12), 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(mesesTrabalhadosNoAno));
         response.setDecimoTerceiroProporcional(decimoTerceiroProporcional);
 
-        if(ChronoUnit.MONTHS.between(request.getDataAdmissao().withDayOfMonth(1), request.getDataDesligamento().withDayOfMonth(1)) == 0){
-            mesesTrabalhadosNoAno = 1;
-        }else{
-        mesesTrabalhadosNoAno = ChronoUnit.MONTHS.between(request.getDataAdmissao().withDayOfMonth(1), request.getDataDesligamento().withDayOfMonth(1));
-        }
+        
 
 
 
