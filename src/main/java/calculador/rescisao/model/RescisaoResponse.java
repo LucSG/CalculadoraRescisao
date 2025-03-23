@@ -25,8 +25,6 @@ public class RescisaoResponse {
 
     //Outros
     private BigDecimal avisoPrevioIndenizado;
-
-    private boolean avisoPrevio;
     //total
     private BigDecimal totalBruto;
     private BigDecimal totalLiquido;
