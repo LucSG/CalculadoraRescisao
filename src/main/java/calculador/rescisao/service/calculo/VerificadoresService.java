@@ -1,5 +1,6 @@
 package calculador.rescisao.service.calculo;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 
@@ -14,11 +15,7 @@ public class VerificadoresService {
     public static int quantidadeDiasMes(RescisaoRequest request) { //pegar a quantidade de dias no mes 
         YearMonth yearMonth = YearMonth.of(request.getDataDesligamento().getYear(), request.getDataDesligamento().getMonth());
         int maximoDiasNoMes = yearMonth.lengthOfMonth();
-        if (maximoDiasNoMes >= 30) {
-            return 30;
-        } else {
-            return maximoDiasNoMes;
-        }
+        return Math.min(30, maximoDiasNoMes);
     }
 
     public static boolean mesmoMes(RescisaoRequest request) {//verificador se a pessoa comecou e terminou de trabalhar no mesmo mês
@@ -33,16 +30,21 @@ public class VerificadoresService {
         } else {
             meses = ChronoUnit.MONTHS.between(request.getDataAdmissao().withDayOfMonth(1), request.getDataDesligamento().withDayOfMonth(1));//calcula a quantidade de meses
             if (request.getDataAdmissao().getDayOfMonth() > 15)//se entrou depois do dia 15 tira um mes
-            {
                 meses--;
-            }
         }
 
         if (request.getDataDesligamento().getDayOfMonth() >= 15)//se saiu depois do dia 15 conta mais um mes
-        {
+            meses++;
+        return meses;
+    }
+
+    public static int calcularMesesPeriodoAquisitivo(RescisaoRequest request) {
+        LocalDate inicioUltimoPeriodoAquisitivo = request.getDataAdmissao().plusYears(ChronoUnit.YEARS.between(request.getDataAdmissao(), request.getDataDesligamento()));
+        long meses = ChronoUnit.MONTHS.between(inicioUltimoPeriodoAquisitivo, request.getDataDesligamento());
+
+        if (request.getDataDesligamento().getDayOfMonth() >= 15) {
             meses++;
         }
-
-        return meses;
+        return (int) Math.min(meses, 12);
     }
 }

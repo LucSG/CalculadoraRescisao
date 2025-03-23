@@ -10,21 +10,22 @@ import calculador.rescisao.model.RescisaoRequest;
 @Service
 public class FeriasService{
 
-    public static BigDecimal calculoFeriasProporcionais(RescisaoRequest request){
+    public BigDecimal calculoFeriasProporcionais(RescisaoRequest request){
         BigDecimal valorFerias;
         valorFerias = request.getSalario().divide(BigDecimal.valueOf(12) , 5, RoundingMode.HALF_UP)
-        .multiply(BigDecimal.valueOf(VerificadoresService.quantidadeMeses(request)));
+        .multiply(BigDecimal.valueOf(VerificadoresService.calcularMesesPeriodoAquisitivo(request)));
         return valorFerias;
     }
 
-    public static BigDecimal calculoTercoFerias(RescisaoRequest request){
+    public BigDecimal calculoTercoFerias(RescisaoRequest request){
         return calculoFeriasProporcionais(request).divide(BigDecimal.valueOf(3),5,RoundingMode.HALF_UP);
     }
 
-    public static BigDecimal feriasVencidas(RescisaoRequest request){
-        BigDecimal ferias;
-        ferias = request.getSalario().add(request.getSalario().divide(BigDecimal.valueOf(3), 5, RoundingMode.HALF_UP));
-        return ferias;
+    public BigDecimal feriasVencidas(RescisaoRequest request){
+        return request.getSalario();
     }
 
+    public BigDecimal tercoFeriasVencidas(RescisaoRequest request){
+        return request.getSalario().divide(BigDecimal.valueOf(3), 5, RoundingMode.HALF_UP);
+    }
 }

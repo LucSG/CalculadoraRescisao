@@ -23,8 +23,9 @@ public class RescisaoResponse {
     private BigDecimal feriasProporcionais;
     private BigDecimal umTercoFeriasProporcionais;
 
-    //Outros
+    //avisoPrevio
     private BigDecimal avisoPrevioIndenizado;
+
     //total
     private BigDecimal totalBruto;
     private BigDecimal totalLiquido;
