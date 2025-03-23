@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import calculador.rescisao.model.RescisaoRequest;
 import calculador.rescisao.model.RescisaoResponse;
+import calculador.rescisao.service.calculo.AvisoPrevioService;
 import calculador.rescisao.service.calculo.FeriasService;
 import calculador.rescisao.service.calculo.SaldoSalarioService;
 import calculador.rescisao.service.calculo.VerificadoresService;
@@ -35,7 +36,13 @@ public class RescisaoService {
         //Calculo de ferias
         response.setFeriasProporcionais(FeriasService.calculoFeriasProporcionais(request).setScale(2, RoundingMode.HALF_UP));
         response.setUmTercoFerias(FeriasService.calculoTercoFerias(request).setScale(2, RoundingMode.HALF_UP));
+        if(request.isFeriasVencidas()){
+            response.setFeriasVencidas(FeriasService.feriasVencidas(request));
+        }
 
+        if(request.isAvisoPrevio()){
+            response.setAvisoPrevioIndenizado(AvisoPrevioService.valorAvisoPrevio(request));
+        }
         //-----------------------------------------------------------------------------
 
         //Cálculo do INSS + IRRF Saldo de Salário
@@ -49,8 +56,6 @@ public class RescisaoService {
         response.setDecimoTerceiroProporcional(decimoTerceiroProporcional);
 
         //FERIAS
-        //Aviso prévio indenizado
-        response.setAvisoPrevioIndenizado(BigDecimal.ZERO);
 
         // Cálculo do total bruto
         //BigDecimal totalBruto = saldoSalarioService.add(decimoTerceiroProporcional).add(response.getFeriasProporcionais()).add(response.getUmTercoFerias());
