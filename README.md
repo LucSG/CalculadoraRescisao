@@ -133,5 +133,4 @@ A API está disponível no endereço `http://localhost:8080`.
 *   [   ] Adicionar suporte para diferentes tipos de rescisão (por justa causa, acordo, etc.).
 *   [   ] Adicionar testes unitários e de integração para garantir a qualidade do código.
 *   [   ] Melhorar o tratamento de erros (retornar mensagens de erro mais específicas e códigos de status HTTP apropriados).
-*   [   ] Implementar autenticação e autorização (para proteger a API contra acesso não autorizado).
 
