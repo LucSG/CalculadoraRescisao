@@ -12,17 +12,17 @@ import calculador.rescisao.model.RescisaoRequest;
 
 public class VerificadoresService {
 
-    public static int quantidadeDiasMes(RescisaoRequest request) { //pegar a quantidade de dias no mes 
+    public int quantidadeDiasMes(RescisaoRequest request) { //pegar a quantidade de dias no mes 
         YearMonth yearMonth = YearMonth.of(request.getDataDesligamento().getYear(), request.getDataDesligamento().getMonth());
         int maximoDiasNoMes = yearMonth.lengthOfMonth();
         return Math.min(30, maximoDiasNoMes);
     }
 
-    public static boolean mesmoMes(RescisaoRequest request) {//verificador se a pessoa comecou e terminou de trabalhar no mesmo mês
+    public boolean mesmoMes(RescisaoRequest request) {//verificador se a pessoa comecou e terminou de trabalhar no mesmo mês
         return request.getDataAdmissao().getYear() == request.getDataDesligamento().getYear() && request.getDataAdmissao().getMonth() == request.getDataDesligamento().getMonth();
     }
 
-    public static long quantidadeMeses(RescisaoRequest request) {//pegar quantidade de meses trabalhados
+    public long quantidadeMeses(RescisaoRequest request) {//pegar quantidade de meses trabalhados
         //se comecou antes do dia 15 ele já conta um mês! && se foi demitido dia 15 ou depois o mês inteiro também conta!
         long meses = 0;
         if (request.getDataAdmissao().getYear() < request.getDataDesligamento().getYear()) {
@@ -38,7 +38,7 @@ public class VerificadoresService {
         return meses;
     }
 
-    public static int calcularMesesPeriodoAquisitivo(RescisaoRequest request) {
+    public int calcularMesesPeriodoAquisitivo(RescisaoRequest request) {//periodo aquisitivo é diferente de meses trabalhados, aqui se leva em consideração o inicio do periodo aquisitivo(mes admissão) e não inicio do ano
         LocalDate inicioUltimoPeriodoAquisitivo = request.getDataAdmissao().plusYears(ChronoUnit.YEARS.between(request.getDataAdmissao(), request.getDataDesligamento()));
         long meses = ChronoUnit.MONTHS.between(inicioUltimoPeriodoAquisitivo, request.getDataDesligamento());
 

@@ -19,10 +19,10 @@ public class SaldoSalarioService {
     public BigDecimal calcular(RescisaoRequest request) {
         //calcular dias trabalhados / dias do mes
         if(verificadoresService.mesmoMes(request)){//a logica e um pouco diferente se o trabalho iniciou e encerrou no mesmo mes
-            return request.getSalario().divide(BigDecimal.valueOf(VerificadoresService.quantidadeDiasMes(request)), 5, RoundingMode.HALF_UP)
+            return request.getSalario().divide(BigDecimal.valueOf(verificadoresService.quantidadeDiasMes(request)), 5, RoundingMode.HALF_UP)
             .multiply(BigDecimal.valueOf(ChronoUnit.DAYS.between(request.getDataAdmissao(), request.getDataDesligamento()) + 1));//Salario / qnt dias * dias trabalhados(demissao | admissao)
         }else{
-            return request.getSalario().divide(BigDecimal.valueOf(VerificadoresService.quantidadeDiasMes(request)), 5, RoundingMode.HALF_UP)
+            return request.getSalario().divide(BigDecimal.valueOf(verificadoresService.quantidadeDiasMes(request)), 5, RoundingMode.HALF_UP)
             .multiply(BigDecimal.valueOf(ChronoUnit.DAYS.between(request.getDataDesligamento().withDayOfMonth(1), request.getDataDesligamento()) +1));//Salario / qnt dias * dias trabalhados (demissao | dia 1 do mes) 
         }
     }

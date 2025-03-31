@@ -28,6 +28,8 @@ public class RescisaoService {
     private InssService inssService;
     @Autowired
     private IrrfService irrfService;
+    @Autowired
+    private AvisoPrevioService avisoPrevioService;
 
     public RescisaoResponse calcularRescisao(RescisaoRequest request) {
 
@@ -36,67 +38,84 @@ public class RescisaoService {
         if (request.getSalario() == null || request.getSalario().compareTo(BigDecimal.ZERO) <= 0) {//salario não pode ser menor que 0
             throw new IllegalArgumentException("Salário inválido.");
         }
-        
-        BigDecimal saldoSalario;
-        BigDecimal inssSalario;
-        BigDecimal irrfSalario;
-        BigDecimal feriasProporcionais;
-        BigDecimal umTercoFeriasProporcionais;
-        BigDecimal feriasVencidas = BigDecimal.ZERO;
-        BigDecimal umTercoFerias = BigDecimal.ZERO;
-        BigDecimal avisoPrevio = BigDecimal.ZERO;
-        BigDecimal decimoTerceiro;
-        BigDecimal totalBruto;
-        BigDecimal totalLiquido;
-        BigDecimal inss13;
-        BigDecimal irrf13;
+    
+        calcularSaldoSalarioETributos(request, response);
 
-        //retorno do calculo do saldo de salario e INSS e IRRF em 2 casas decimais
-        saldoSalario = saldoSalarioService.calcular(request).setScale(2, RoundingMode.HALF_UP); //pego saldoSalario
-        inssSalario = inssService.calcularInss(saldoSalario, request.getDataDesligamento().getYear());//vejo o inss
-        irrfSalario = irrfService.calcularIrrf((saldoSalario.subtract(inssSalario)), request.getDataDesligamento().getYear());//e ja pego o valor do irrf
+        calcularFerias(request, response);
 
+        calcularAvisoPrevio(request, response);
+
+        calcularDecimoTerceiroETributos(request, response);
+
+        calcularTotais(response);
+
+        return response;
+    }
+
+
+    private void calcularSaldoSalarioETributos(RescisaoRequest request, RescisaoResponse response) {
+        BigDecimal saldoSalario = saldoSalarioService.calcular(request).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal inssSalario = inssService.calcularInss(saldoSalario, request.getDataDesligamento().getYear());
+        BigDecimal irrfSalario = irrfService.calcularIrrf((saldoSalario.subtract(inssSalario)), request.getDataDesligamento().getYear());
 
         response.setSaldoSalario(saldoSalario);
         response.setInssSalario(inssSalario);
         response.setIrrfSalario(irrfSalario);
+    }
 
-        //Calculo de ferias + 1/3
-        feriasProporcionais = feriasService.calculoFeriasProporcionais(request).setScale(2, RoundingMode.HALF_UP);
-        umTercoFeriasProporcionais = feriasService.calculoTercoFerias(request).setScale(2, RoundingMode.HALF_UP);
+    private void calcularFerias(RescisaoRequest request, RescisaoResponse response) {
+        BigDecimal feriasProporcionais = feriasService.calculoFeriasProporcionais(request).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal umTercoFeriasProporcionais = feriasService.calculoTercoFerias(request).setScale(2, RoundingMode.HALF_UP);
 
         response.setFeriasProporcionais(feriasProporcionais);
         response.setUmTercoFeriasProporcionais(umTercoFeriasProporcionais);
 
-
-        //ferias vencidas + avisoPrevio
         if (request.isFeriasVencidas()) {
-            feriasVencidas = feriasService.feriasVencidas(request).setScale(2, RoundingMode.HALF_UP);
-            umTercoFerias = feriasService.tercoFeriasVencidas(request).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal feriasVencidas = feriasService.feriasVencidas(request).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal umTercoFerias = feriasService.tercoFeriasVencidas(request).setScale(2, RoundingMode.HALF_UP);
             response.setFeriasVencidas(feriasVencidas);
             response.setUmTercoFerias(umTercoFerias);
+        } else {
+            response.setFeriasVencidas(BigDecimal.ZERO);
+            response.setUmTercoFerias(BigDecimal.ZERO);
         }
+    }
 
-        if (request.isAvisoPrevio()) {
-            avisoPrevio = AvisoPrevioService.valorAvisoPrevio(request).setScale(2, RoundingMode.HALF_UP);
-            response.setAvisoPrevioIndenizado(avisoPrevio);
-        }
+    private void calcularAvisoPrevio(RescisaoRequest request, RescisaoResponse response) {
+        BigDecimal avisoPrevio = avisoPrevioService.calcularAvisoPrevio(request); 
+        response.setAvisoPrevioIndenizado(avisoPrevio);
+    }
 
-        //calculo 13° 
-        decimoTerceiro = decimoTerceiroService.calculoDecimoTerceiroProporcionail(request).setScale(2, RoundingMode.HALF_UP); //pego 13
-        inss13 = inssService.calcularInss(decimoTerceiro, request.getDataDesligamento().getYear()); //vejo o qnt de inss
-        irrf13 = irrfService.calcularIrrf((decimoTerceiro.subtract(inss13)), request.getDataDesligamento().getYear()); //irrf so conta decimo - inss
+    private void calcularDecimoTerceiroETributos(RescisaoRequest request, RescisaoResponse response) {
+        BigDecimal decimoTerceiro = decimoTerceiroService.calculoDecimoTerceiroProporcionail(request).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal inss13 = inssService.calcularInss(decimoTerceiro, request.getDataDesligamento().getYear());
+        BigDecimal irrf13 = irrfService.calcularIrrf((decimoTerceiro.subtract(inss13)), request.getDataDesligamento().getYear());
 
         response.setDecimoTerceiroProporcional(decimoTerceiro);
         response.setInss13(inss13);
         response.setIrrf13(irrf13);
+    }
 
-        totalBruto = saldoSalario.add(feriasProporcionais).add(umTercoFeriasProporcionais).add(feriasVencidas).add(umTercoFerias).add(avisoPrevio).add(decimoTerceiro);
-        totalLiquido = totalBruto.subtract(inssSalario).subtract(irrfSalario).subtract(inss13).subtract(irrf13);
+    private void calcularTotais(RescisaoResponse response) {
+        BigDecimal totalBruto = response.getSaldoSalario()
+                .add(response.getFeriasProporcionais())
+                .add(response.getUmTercoFeriasProporcionais())
+                .add(response.getFeriasVencidas())
+                .add(response.getUmTercoFerias())
+                .add(response.getDecimoTerceiroProporcional());
+      
+        BigDecimal totalLiquido = totalBruto.subtract(response.getInssSalario())
+                .subtract(response.getIrrfSalario())
+                .subtract(response.getInss13())
+                .subtract(response.getIrrf13());
 
+        if (response.getAvisoPrevioIndenizado().compareTo(BigDecimal.ZERO) == 1) {
+            totalBruto = totalBruto.add(response.getAvisoPrevioIndenizado());
+        }
+        if (response.getAvisoPrevioIndenizado().compareTo(BigDecimal.ZERO) == -1) {
+            totalLiquido = totalLiquido.add(response.getAvisoPrevioIndenizado());
+        }
         response.setTotalBruto(totalBruto);
         response.setTotalLiquido(totalLiquido);
-
-        return response;
     }
 }

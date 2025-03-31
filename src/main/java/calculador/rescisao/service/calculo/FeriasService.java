@@ -3,6 +3,7 @@ package calculador.rescisao.service.calculo;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import calculador.rescisao.model.RescisaoRequest;
@@ -10,10 +11,13 @@ import calculador.rescisao.model.RescisaoRequest;
 @Service
 public class FeriasService{
 
+    @Autowired
+    private VerificadoresService verificadoresService;
+
     public BigDecimal calculoFeriasProporcionais(RescisaoRequest request){
         BigDecimal valorFerias;
         valorFerias = request.getSalario().divide(BigDecimal.valueOf(12) , 5, RoundingMode.HALF_UP)
-        .multiply(BigDecimal.valueOf(VerificadoresService.calcularMesesPeriodoAquisitivo(request)));
+        .multiply(BigDecimal.valueOf(verificadoresService.calcularMesesPeriodoAquisitivo(request)));
         return valorFerias;
     }
 
