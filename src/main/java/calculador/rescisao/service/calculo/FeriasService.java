@@ -14,6 +14,7 @@ public class FeriasService{
     @Autowired
     private VerificadoresService verificadoresService;
 
+
     public BigDecimal calculoFeriasProporcionais(RescisaoRequest request){
         BigDecimal valorFerias;
         valorFerias = request.getSalario().divide(BigDecimal.valueOf(12) , 5, RoundingMode.HALF_UP)
