@@ -1,7 +1,7 @@
 # CalculadoraRescisao
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://example.com/build)
-[![Coverage Status](https://img.shields.io/badge/coverage-75%25-green)](https://example.com/coverage)
+[![Coverage Status](https://img.shields.io/badge/coverage-90%25-green)](https://example.com/coverage)
 
 Uma API REST para calcular a rescisão trabalhista brasileira, desenvolvida com Spring Boot.
 
@@ -129,8 +129,8 @@ A API está disponível no endereço `http://localhost:8080`.
 ## Próximos Passos (Roadmap)
 
 *   [ X ] Implementar o cálculo correto de INSS e IRRF (considerando as tabelas progressivas e as deduções permitidas).
-*   [   ] Implementar o cálculo correto do aviso prévio indenizado (considerando o tempo de serviço do empregado).
-*   [   ] Adicionar suporte para diferentes tipos de rescisão (por justa causa, acordo, etc.).
+*   [ X ] Implementar o cálculo correto do aviso prévio indenizado (considerando o tempo de serviço do empregado).
+*   [ X ] Adicionar suporte para diferentes tipos de rescisão (por justa causa, acordo, etc.).
 *   [   ] Adicionar testes unitários e de integração para garantir a qualidade do código.
 *   [   ] Melhorar o tratamento de erros (retornar mensagens de erro mais específicas e códigos de status HTTP apropriados).
 
