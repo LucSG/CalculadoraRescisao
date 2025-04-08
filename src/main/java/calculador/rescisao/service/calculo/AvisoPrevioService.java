@@ -50,7 +50,9 @@ public class AvisoPrevioService {
                     return valorAvisoPrevio(request).setScale(2, RoundingMode.HALF_UP);
                 }
                 if (diasAvisoPrevio(request) > 30) {
-                    return request.getSalario().divide(BigDecimal.valueOf(30), 5, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(diasAvisoPrevio(request) - 30)).setScale(2, RoundingMode.HALF_UP);
+                    return request.getSalario().divide(BigDecimal.valueOf(30), 5, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(diasAvisoPrevio(request) - 30))
+                    .setScale(2, RoundingMode.HALF_UP);
                 }
                 return BigDecimal.ZERO;
             case POR_JUSTA_CAUSA:
@@ -64,12 +66,13 @@ public class AvisoPrevioService {
                     return valorAvisoPrevio(request).setScale(2, RoundingMode.HALF_UP);
                 }
                 if (diasAvisoPrevio(request) > 30) {
-                    return request.getSalario().divide(BigDecimal.valueOf(30), 5, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(diasAvisoPrevio(request) - 30)).setScale(2, RoundingMode.HALF_UP);
+                    return request.getSalario().divide(BigDecimal.valueOf(30), 5, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(diasAvisoPrevio(request) - 30))
+                    .setScale(2, RoundingMode.HALF_UP);
                 }
                 return BigDecimal.ZERO;
             default:
                 throw new IllegalArgumentException("Tipo de rescisão inválido.");
         }
-
     }
 }
